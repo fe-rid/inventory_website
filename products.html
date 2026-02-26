@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - Inventory Management System</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="container">
+                <a href="dashboard.html" style="color:white; text-decoration:none; font-size:1.5rem; font-weight:bold;">InvSystem</a>
+                <ul>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li><a href="transactions.html">Transactions</a></li>
+                    <li><a href="reports.html">Reports</a></li>
+                    <li><a href="#" id="logout-btn" style="color:#ff7675;">Logout</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <main class="container">
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>Product Management</h1>
+            <button class="btn btn-success admin-only" onclick="showAddModal()">Add New Product</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Qty</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="products-body">
+                    <!-- Data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Simple Modal for Add/Edit -->
+    <div id="product-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2 id="modal-title">Add Product</h2>
+            <form id="product-form">
+                <input type="hidden" name="product_id" id="prod-id">
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" name="product_name" id="prod-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <input type="text" name="category" id="prod-category" required>
+                </div>
+                <div class="form-group">
+                    <label>Price</label>
+                    <input type="number" step="0.01" name="price" id="prod-price" required>
+                </div>
+                <div class="form-group">
+                    <label>Low Stock Threshold</label>
+                    <input type="number" name="low_stock_threshold" id="prod-threshold" value="10" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Product</button>
+                <button type="button" class="btn" style="background:#ccc; margin-left:10px;" onclick="closeModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 500px; }
+    </style>
+
+    <script src="assets/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            InvApp.checkSession().then(loadProducts);
+        });
+
+        function loadProducts() {
+            fetch('api/products.php')
+            .then(res => res.json())
+            .then(data => {
+                const body = document.getElementById('products-body');
+                body.innerHTML = '';
+                const isAdmin = InvApp.user && InvApp.user.role === 'admin';
+                
+                data.data.forEach(p => {
+                    const tr = document.createElement('tr');
+                    const isLow = p.quantity <= p.low_stock_threshold;
+                    tr.innerHTML = `
+                        <td>${p.product_name}</td>
+                        <td>${p.category}</td>
+                        <td>$${parseFloat(p.price).toFixed(2)}</td>
+                        <td>${p.quantity}</td>
+                        <td><span style="color:${isLow ? 'red' : 'green'}; font-weight:bold;">${isLow ? 'Low Stock' : 'Normal'}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary admin-only-inline" style="${!isAdmin ? 'display:none' : ''}" onclick="editProduct(${p.product_id})">Edit</button>
+                            <button class="btn btn-sm btn-danger admin-only-inline" style="${!isAdmin ? 'display:none' : ''}" onclick="deleteProduct(${p.product_id})">Delete</button>
+                            <span class="staff-text" style="${isAdmin ? 'display:none' : ''}">Read Only</span>
+                        </td>
+                    `;
+                    body.appendChild(tr);
+                });
+            });
+        }
+
+        function showAddModal() {
+            document.getElementById('product-form').reset();
+            document.getElementById('prod-id').value = '';
+            document.getElementById('modal-title').innerText = 'Add Product';
+            document.getElementById('product-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('product-modal').style.display = 'none';
+        }
+
+        function editProduct(id) {
+            fetch(`api/products.php?id=${id}`)
+            .then(res => res.json())
+            .then(data => {
+                const p = data.data;
+                document.getElementById('prod-id').value = p.product_id;
+                document.getElementById('prod-name').value = p.product_name;
+                document.getElementById('prod-category').value = p.category;
+                document.getElementById('prod-price').value = p.price;
+                document.getElementById('prod-threshold').value = p.low_stock_threshold;
+                document.getElementById('modal-title').innerText = 'Edit Product';
+                document.getElementById('product-modal').style.display = 'flex';
+            });
+        }
+
+        function deleteProduct(id) {
+            if (confirm('Are you sure?')) {
+                fetch(`api/products.php?id=${id}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) loadProducts();
+                    else alert(data.message);
+                });
+            }
+        }
+
+        document.getElementById('product-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch('api/products.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    closeModal();
+                    loadProducts();
+                } else alert(data.message);
+            });
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            fetch('api/logout.php').then(() => window.location.href = 'index.html');
+        });
+    </script>
+</body>
+</html>

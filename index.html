@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Inventory Management System</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <h1>Inventory System</h1>
+        <p>Login to your account</p>
+        
+        <div id="login-error" class="alert alert-danger" style="display:none;"></div>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" name="username" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+    </div>
+    <script src="assets/js/main.js"></script>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const errorDiv = document.getElementById('login-error');
+
+            fetch('api/login.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.text(); // Get as text first to handle potential PHP errors
+            })
+            .then(text => {
+                try {
+                    const data = JSON.parse(text);
+                    if (data.success) {
+                        window.location.href = data.redirect;
+                    } else {
+                        errorDiv.textContent = data.message;
+                        errorDiv.style.display = 'block';
+                    }
+                } catch (e) {
+                    console.error('Invalid JSON response:', text);
+                    errorDiv.textContent = 'Server Error: The response was not valid JSON. Check console for details.';
+                    errorDiv.style.display = 'block';
+                }
+            })
+            .catch(err => {
+                console.error('Fetch Error:', err);
+                errorDiv.textContent = 'Connection Error: ' + err.message;
+                errorDiv.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>

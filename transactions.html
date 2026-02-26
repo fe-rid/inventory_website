@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions - Inventory Management System</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="container">
+                <a href="dashboard.html" style="color:white; text-decoration:none; font-size:1.5rem; font-weight:bold;">InvSystem</a>
+                <ul>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li><a href="transactions.html">Transactions</a></li>
+                    <li><a href="reports.html">Reports</a></li>
+                    <li><a href="#" id="logout-btn" style="color:#ff7675;">Logout</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <main class="container">
+        <h1>Stock IN / OUT</h1>
+        <div id="msg" class="alert" style="display:none;"></div>
+
+        <div style="max-width: 600px; background: white; padding: 2rem; border-radius: 8px;">
+            <form id="trans-form">
+                <div class="form-group">
+                    <label>Select Product</label>
+                    <select name="product_id" id="prod-select" required>
+                        <option value="">-- Loading products... --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Transaction Type</label>
+                    <select name="transaction_type" required>
+                        <option value="in">Stock IN (+)</option>
+                        <option value="out">Stock OUT (-)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" name="quantity" min="1" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:auto;">Process Transaction</button>
+            </form>
+        </div>
+    </main>
+
+    <script src="assets/js/main.js"></script>
+    <script>
+        function loadProductsForSelect() {
+            fetch('api/products.php')
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById('prod-select');
+                select.innerHTML = '<option value="">-- Choose Product --</option>';
+                data.data.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.product_id;
+                    opt.textContent = `${p.product_name} (Current: ${p.quantity})`;
+                    select.appendChild(opt);
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProductsForSelect);
+
+        document.getElementById('trans-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch('api/transactions.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                const msg = document.getElementById('msg');
+                msg.textContent = data.success ? 'Transaction successful!' : 'Error: ' + data.message;
+                msg.className = data.success ? 'alert alert-success' : 'alert alert-danger';
+                msg.style.display = 'block';
+                if(data.success) {
+                    this.reset();
+                    loadProductsForSelect(); // Refresh quantities
+                }
+            });
+        });
+    </script>
+    <style>
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</body>
+</html>
