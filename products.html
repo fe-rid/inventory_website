@@ -86,13 +86,13 @@
         });
 
         function loadProducts() {
-            fetch('api/products.php')
+            fetch('api/products')
             .then(res => res.json())
             .then(data => {
                 const body = document.getElementById('products-body');
                 body.innerHTML = '';
                 const isAdmin = InvApp.user && InvApp.user.role === 'admin';
-                
+
                 data.data.forEach(p => {
                     const tr = document.createElement('tr');
                     const isLow = p.quantity <= p.low_stock_threshold;
@@ -103,9 +103,9 @@
                         <td>${p.quantity}</td>
                         <td><span style="color:${isLow ? 'red' : 'green'}; font-weight:bold;">${isLow ? 'Low Stock' : 'Normal'}</span></td>
                         <td>
-                            <button class="btn btn-sm btn-primary admin-only-inline" style="${!isAdmin ? 'display:none' : ''}" onclick="editProduct(${p.product_id})">Edit</button>
-                            <button class="btn btn-sm btn-danger admin-only-inline" style="${!isAdmin ? 'display:none' : ''}" onclick="deleteProduct(${p.product_id})">Delete</button>
-                            <span class="staff-text" style="${isAdmin ? 'display:none' : ''}">Read Only</span>
+                            <button class="btn btn-sm btn-primary" style="${!isAdmin ? 'display:none' : ''}" onclick="editProduct('${p.product_id}')">Edit</button>
+                            <button class="btn btn-sm btn-danger" style="${!isAdmin ? 'display:none' : ''}" onclick="deleteProduct('${p.product_id}')">Delete</button>
+                            <span style="${isAdmin ? 'display:none' : ''}">Read Only</span>
                         </td>
                     `;
                     body.appendChild(tr);
@@ -125,7 +125,7 @@
         }
 
         function editProduct(id) {
-            fetch(`api/products.php?id=${id}`)
+            fetch(`api/products/${id}`)
             .then(res => res.json())
             .then(data => {
                 const p = data.data;
@@ -141,7 +141,7 @@
 
         function deleteProduct(id) {
             if (confirm('Are you sure?')) {
-                fetch(`api/products.php?id=${id}`, { method: 'DELETE' })
+                fetch(`api/products/${id}`, { method: 'DELETE' })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) loadProducts();
@@ -152,10 +152,17 @@
 
         document.getElementById('product-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            const formData = new FormData(this);
-            fetch('api/products.php', {
+            const payload = {
+                product_id:          document.getElementById('prod-id').value || undefined,
+                product_name:        document.getElementById('prod-name').value,
+                category:            document.getElementById('prod-category').value,
+                price:               document.getElementById('prod-price').value,
+                low_stock_threshold: document.getElementById('prod-threshold').value,
+            };
+            fetch('api/products', {
                 method: 'POST',
-                body: formData
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
             })
             .then(res => res.json())
             .then(data => {
@@ -168,7 +175,7 @@
 
         document.getElementById('logout-btn').addEventListener('click', function(e) {
             e.preventDefault();
-            fetch('api/logout.php').then(() => window.location.href = 'index.html');
+            fetch('api/logout').then(() => window.location.href = 'index.html');
         });
     </script>
 </body>

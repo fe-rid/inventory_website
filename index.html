@@ -29,36 +29,25 @@
     <script>
         document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            const formData = new FormData(this);
             const errorDiv = document.getElementById('login-error');
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
-            fetch('api/login.php', {
+            fetch('api/login', {
                 method: 'POST',
-                body: formData
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
             })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return res.text(); // Get as text first to handle potential PHP errors
-            })
-            .then(text => {
-                try {
-                    const data = JSON.parse(text);
-                    if (data.success) {
-                        window.location.href = data.redirect;
-                    } else {
-                        errorDiv.textContent = data.message;
-                        errorDiv.style.display = 'block';
-                    }
-                } catch (e) {
-                    console.error('Invalid JSON response:', text);
-                    errorDiv.textContent = 'Server Error: The response was not valid JSON. Check console for details.';
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect;
+                } else {
+                    errorDiv.textContent = data.message;
                     errorDiv.style.display = 'block';
                 }
             })
             .catch(err => {
-                console.error('Fetch Error:', err);
                 errorDiv.textContent = 'Connection Error: ' + err.message;
                 errorDiv.style.display = 'block';
             });

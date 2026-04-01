@@ -52,7 +52,7 @@
     <script src="assets/js/main.js"></script>
     <script>
         function loadProductsForSelect() {
-            fetch('api/products.php')
+            fetch('api/products')
             .then(res => res.json())
             .then(data => {
                 const select = document.getElementById('prod-select');
@@ -70,10 +70,15 @@
 
         document.getElementById('trans-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            const formData = new FormData(this);
-            fetch('api/transactions.php', {
+            const payload = {
+                product_id:       document.getElementById('prod-select').value,
+                transaction_type: this.querySelector('[name="transaction_type"]').value,
+                quantity:         this.querySelector('[name="quantity"]').value,
+            };
+            fetch('api/transactions', {
                 method: 'POST',
-                body: formData
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
             })
             .then(res => res.json())
             .then(data => {
@@ -81,9 +86,9 @@
                 msg.textContent = data.success ? 'Transaction successful!' : 'Error: ' + data.message;
                 msg.className = data.success ? 'alert alert-success' : 'alert alert-danger';
                 msg.style.display = 'block';
-                if(data.success) {
+                if (data.success) {
                     this.reset();
-                    loadProductsForSelect(); // Refresh quantities
+                    loadProductsForSelect();
                 }
             });
         });

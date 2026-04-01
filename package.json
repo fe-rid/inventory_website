@@ -1,0 +1,34 @@
+{
+  "name": "inventory",
+  "version": "1.0.0",
+  "description": "<p align=\"center\">\r   <img src=\"assets/banner.png\" width=\"100%\" alt=\"Inventory Management System Banner\" style=\"border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);\" />\r </p>",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "seed": "node seed.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fe-rid/inventory_website.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/fe-rid/inventory_website/issues"
+  },
+  "homepage": "https://github.com/fe-rid/inventory_website#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "mongodb": "^7.1.1",
+    "mongoose": "^9.3.3"
+  }
+}

@@ -44,32 +44,34 @@
     <script src="assets/js/main.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('api/transactions.php')
-            .then(res => res.json())
-            .then(data => {
-                const body = document.getElementById('reports-body');
-                body.innerHTML = '';
-                if(data.data.length === 0) {
-                    body.innerHTML = '<tr><td colspan="5" style="text-align:center;">No transactions found.</td></tr>';
-                } else {
-                    data.data.forEach(r => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td>${new Date(r.transaction_date).toLocaleString()}</td>
-                            <td>${r.product_name}</td>
-                            <td style="font-weight:bold; color: ${r.transaction_type == 'in' ? 'green' : 'red'};">${r.transaction_type.toUpperCase()}</td>
-                            <td>${r.quantity}</td>
-                            <td>${r.username}</td>
-                        `;
-                        body.appendChild(tr);
-                    });
-                }
+            InvApp.checkSession().then(() => {
+                fetch('api/transactions')
+                .then(res => res.json())
+                .then(data => {
+                    const body = document.getElementById('reports-body');
+                    body.innerHTML = '';
+                    if (!data.data || data.data.length === 0) {
+                        body.innerHTML = '<tr><td colspan="5" style="text-align:center;">No transactions found.</td></tr>';
+                    } else {
+                        data.data.forEach(r => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td>${new Date(r.transaction_date).toLocaleString()}</td>
+                                <td>${r.product_name}</td>
+                                <td style="font-weight:bold; color: ${r.transaction_type === 'in' ? 'green' : 'red'}">${r.transaction_type.toUpperCase()}</td>
+                                <td>${r.quantity}</td>
+                                <td>${r.username}</td>
+                            `;
+                            body.appendChild(tr);
+                        });
+                    }
+                });
             });
         });
 
         document.getElementById('logout-btn').addEventListener('click', function(e) {
             e.preventDefault();
-            fetch('api/logout.php').then(() => window.location.href = 'index.html');
+            fetch('api/logout').then(() => window.location.href = 'index.html');
         });
     </script>
 </body>

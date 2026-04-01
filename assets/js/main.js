@@ -1,9 +1,8 @@
 /**
- * Common Inventory System JS
+ * Common Inventory System JS — Node.js / MongoDB version
  */
 
 const InvApp = {
-    // Check session status on every authenticated page load
     user: null,
 
     checkSession: function () {
@@ -11,7 +10,7 @@ const InvApp = {
             return Promise.resolve(null);
         }
 
-        return fetch('api/dashboard.php')
+        return fetch('api/dashboard')
             .then(res => res.json())
             .then(data => {
                 if (!data.success && data.redirect) {
@@ -36,16 +35,14 @@ const InvApp = {
         }
     },
 
-    // Handle standard logout
     logout: function () {
         if (confirm("Are you sure you want to logout?")) {
-            fetch('api/logout.php')
+            fetch('api/logout')
                 .then(() => window.location.href = 'index.html')
-                .catch(err => window.location.href = 'index.html');
+                .catch(() => window.location.href = 'index.html');
         }
     },
 
-    // Helper to format currency
     formatCurrency: function (value) {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -54,7 +51,6 @@ const InvApp = {
     }
 };
 
-// Auto-init for navigation buttons
 document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
@@ -64,8 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Run session check if not on index
-    if (!window.location.pathname.endsWith('index.html')) {
+    if (!window.location.pathname.endsWith('index.html') && window.location.pathname !== '/') {
         InvApp.checkSession();
     }
 });
