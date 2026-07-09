@@ -1,182 +1,287 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Products - Inventory Management System</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+  <body>
     <header>
-        <nav>
-            <div class="container">
-                <a href="dashboard.html" style="color:white; text-decoration:none; font-size:1.5rem; font-weight:bold;">InvSystem</a>
-                <ul>
-                    <li><a href="dashboard.html">Dashboard</a></li>
-                    <li><a href="products.html">Products</a></li>
-                    <li><a href="transactions.html">Transactions</a></li>
-                    <li><a href="reports.html">Reports</a></li>
-                    <li><a href="#" id="logout-btn" style="color:#ff7675;">Logout</a></li>
-                </ul>
-            </div>
-        </nav>
+      <nav>
+        <div class="container">
+          <a
+            href="dashboard.html"
+            style="
+              color: white;
+              text-decoration: none;
+              font-size: 1.8rem;
+              font-weight: bold;
+              letter-spacing: -1px;
+            "
+            >📦 InvSystem</a
+          >
+          <ul>
+            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li><a href="products.html">📦 Products</a></li>
+            <li><a href="transactions.html">💳 Transactions</a></li>
+            <li><a href="reports.html">📈 Reports</a></li>
+            <li><a href="#" id="logout-btn">🚪 Logout</a></li>
+          </ul>
+        </div>
+      </nav>
     </header>
     <main class="container">
-        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h1>Product Management</h1>
-            <button class="btn btn-success admin-only" onclick="showAddModal()">Add New Product</button>
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 2rem;
+        "
+      >
+        <div>
+          <h1>Product Inventory</h1>
+          <p style="color: var(--text-light); margin-top: 0.5rem">
+            Manage all products in your inventory
+          </p>
         </div>
+        <button class="btn btn-success admin-only" onclick="showAddModal()">
+          ➕ Add New Product
+        </button>
+      </div>
 
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Product Name</th>
-                        <th>Category</th>
-                        <th>Price</th>
-                        <th>Qty</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="products-body">
-                    <!-- Data will be loaded here -->
-                </tbody>
-            </table>
-        </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>📦 Product Name</th>
+              <th>🏷️ Category</th>
+              <th>💰 Price</th>
+              <th>📊 Quantity</th>
+              <th>⚠️ Status</th>
+              <th>⚙️ Actions</th>
+            </tr>
+          </thead>
+          <tbody id="products-body">
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 2rem">
+                Loading...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </main>
 
-    <!-- Simple Modal for Add/Edit -->
-    <div id="product-modal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <h2 id="modal-title">Add Product</h2>
-            <form id="product-form">
-                <input type="hidden" name="product_id" id="prod-id">
-                <div class="form-group">
-                    <label>Product Name</label>
-                    <input type="text" name="product_name" id="prod-name" required>
-                </div>
-                <div class="form-group">
-                    <label>Category</label>
-                    <input type="text" name="category" id="prod-category" required>
-                </div>
-                <div class="form-group">
-                    <label>Price</label>
-                    <input type="number" step="0.01" name="price" id="prod-price" required>
-                </div>
-                <div class="form-group">
-                    <label>Low Stock Threshold</label>
-                    <input type="number" name="low_stock_threshold" id="prod-threshold" value="10" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Save Product</button>
-                <button type="button" class="btn" style="background:#ccc; margin-left:10px;" onclick="closeModal()">Cancel</button>
-            </form>
+    <!-- Modal for Add/Edit Product -->
+    <div id="product-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modal-title">Add Product</h2>
+          <button type="button" class="close-btn" onclick="closeModal()">
+            ×
+          </button>
         </div>
+        <form id="product-form">
+          <input type="hidden" name="product_id" id="prod-id" />
+          <div class="form-group">
+            <label>📦 Product Name</label>
+            <input
+              type="text"
+              name="product_name"
+              id="prod-name"
+              placeholder="Enter product name"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>🏷️ Category</label>
+            <input
+              type="text"
+              name="category"
+              id="prod-category"
+              placeholder="e.g., Electronics"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>💰 Price</label>
+            <input
+              type="number"
+              step="0.01"
+              name="price"
+              id="prod-price"
+              placeholder="0.00"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>⚠️ Low Stock Threshold</label>
+            <input
+              type="number"
+              name="low_stock_threshold"
+              id="prod-threshold"
+              value="10"
+              placeholder="10"
+              required
+            />
+          </div>
+          <div style="display: flex; gap: 1rem">
+            <button type="submit" class="btn btn-success" style="flex: 1">
+              ✓ Save Product
+            </button>
+            <button
+              type="button"
+              class="btn"
+              style="
+                background: var(--border-color);
+                color: var(--text-color);
+                flex: 1;
+              "
+              onclick="closeModal()"
+            >
+              ✕ Cancel
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
-    <style>
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 500px; }
-    </style>
+    <footer
+      style="
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-light);
+        margin-top: 2rem;
+        border-top: 1px solid var(--border-color);
+      "
+    >
+      <p>&copy; 2026 InvSystem - Modern Inventory Management</p>
+    </footer>
 
     <script src="assets/js/main.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            InvApp.checkSession().then(loadProducts);
-        });
+      document.addEventListener("DOMContentLoaded", () => {
+        InvApp.checkSession().then(loadProducts);
+      });
 
-        function loadProducts() {
-            fetch('api/products')
-            .then(res => res.json())
-            .then(data => {
-                const body = document.getElementById('products-body');
-                body.innerHTML = '';
-                const isAdmin = InvApp.user && InvApp.user.role === 'admin';
+      function loadProducts() {
+        fetch("api/products")
+          .then((res) => res.json())
+          .then((data) => {
+            const body = document.getElementById("products-body");
+            body.innerHTML = "";
+            const isAdmin = InvApp.user && InvApp.user.role === "admin";
 
-                data.data.forEach(p => {
-                    const tr = document.createElement('tr');
-                    const isLow = p.quantity <= p.low_stock_threshold;
-                    tr.innerHTML = `
-                        <td>${p.product_name}</td>
+            if (data.data.length === 0) {
+              body.innerHTML =
+                '<tr><td colspan="6" style="text-align:center; padding: 2rem; color: var(--text-light);">No products found.</td></tr>';
+              return;
+            }
+
+            data.data.forEach((p) => {
+              const tr = document.createElement("tr");
+              const isLow = p.quantity <= p.low_stock_threshold;
+              const statusBadge = isLow
+                ? '<span class="badge badge-danger">🔴 Low Stock</span>'
+                : '<span class="badge badge-success">🟢 Normal</span>';
+              tr.innerHTML = `
+                        <td><strong>${p.product_name}</strong></td>
                         <td>${p.category}</td>
                         <td>$${parseFloat(p.price).toFixed(2)}</td>
-                        <td>${p.quantity}</td>
-                        <td><span style="color:${isLow ? 'red' : 'green'}; font-weight:bold;">${isLow ? 'Low Stock' : 'Normal'}</span></td>
+                        <td><strong>${p.quantity}</strong></td>
+                        <td>${statusBadge}</td>
                         <td>
-                            <button class="btn btn-sm btn-primary" style="${!isAdmin ? 'display:none' : ''}" onclick="editProduct('${p.product_id}')">Edit</button>
-                            <button class="btn btn-sm btn-danger" style="${!isAdmin ? 'display:none' : ''}" onclick="deleteProduct('${p.product_id}')">Delete</button>
-                            <span style="${isAdmin ? 'display:none' : ''}">Read Only</span>
+                            ${
+                              isAdmin
+                                ? `
+                                <button class="btn btn-sm btn-primary" style="margin-right: 0.5rem;" onclick="editProduct('${p.product_id}')">✎ Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.product_id}')">🗑 Delete</button>
+                            `
+                                : '<span style="color: var(--text-light);">View Only</span>'
+                            }
                         </td>
                     `;
-                    body.appendChild(tr);
-                });
+              body.appendChild(tr);
+            });
+          });
+      }
+
+      function showAddModal() {
+        document.getElementById("product-form").reset();
+        document.getElementById("prod-id").value = "";
+        document.getElementById("modal-title").innerText = "➕ Add Product";
+        document.getElementById("product-modal").classList.add("show");
+      }
+
+      function closeModal() {
+        document.getElementById("product-modal").classList.remove("show");
+      }
+
+      function editProduct(id) {
+        fetch(`api/products/${id}`)
+          .then((res) => res.json())
+          .then((data) => {
+            const p = data.data;
+            document.getElementById("prod-id").value = p.product_id;
+            document.getElementById("prod-name").value = p.product_name;
+            document.getElementById("prod-category").value = p.category;
+            document.getElementById("prod-price").value = p.price;
+            document.getElementById("prod-threshold").value =
+              p.low_stock_threshold;
+            document.getElementById("modal-title").innerText = "✎ Edit Product";
+            document.getElementById("product-modal").classList.add("show");
+          });
+      }
+
+      function deleteProduct(id) {
+        if (confirm("Are you sure you want to delete this product?")) {
+          fetch(`api/products/${id}`, { method: "DELETE" })
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.success) {
+                loadProducts();
+                alert("Product deleted successfully!");
+              } else {
+                alert(data.message);
+              }
             });
         }
+      }
 
-        function showAddModal() {
-            document.getElementById('product-form').reset();
-            document.getElementById('prod-id').value = '';
-            document.getElementById('modal-title').innerText = 'Add Product';
-            document.getElementById('product-modal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('product-modal').style.display = 'none';
-        }
-
-        function editProduct(id) {
-            fetch(`api/products/${id}`)
-            .then(res => res.json())
-            .then(data => {
-                const p = data.data;
-                document.getElementById('prod-id').value = p.product_id;
-                document.getElementById('prod-name').value = p.product_name;
-                document.getElementById('prod-category').value = p.category;
-                document.getElementById('prod-price').value = p.price;
-                document.getElementById('prod-threshold').value = p.low_stock_threshold;
-                document.getElementById('modal-title').innerText = 'Edit Product';
-                document.getElementById('product-modal').style.display = 'flex';
-            });
-        }
-
-        function deleteProduct(id) {
-            if (confirm('Are you sure?')) {
-                fetch(`api/products/${id}`, { method: 'DELETE' })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) loadProducts();
-                    else alert(data.message);
-                });
-            }
-        }
-
-        document.getElementById('product-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const payload = {
-                product_id:          document.getElementById('prod-id').value || undefined,
-                product_name:        document.getElementById('prod-name').value,
-                category:            document.getElementById('prod-category').value,
-                price:               document.getElementById('prod-price').value,
-                low_stock_threshold: document.getElementById('prod-threshold').value,
-            };
-            fetch('api/products', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    closeModal();
-                    loadProducts();
-                } else alert(data.message);
+      document
+        .getElementById("product-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const payload = {
+            product_id: document.getElementById("prod-id").value || undefined,
+            product_name: document.getElementById("prod-name").value,
+            category: document.getElementById("prod-category").value,
+            price: document.getElementById("prod-price").value,
+            low_stock_threshold:
+              document.getElementById("prod-threshold").value,
+          };
+          fetch("api/products", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.success) {
+                closeModal();
+                loadProducts();
+              } else alert(data.message);
             });
         });
 
-        document.getElementById('logout-btn').addEventListener('click', function(e) {
-            e.preventDefault();
-            fetch('api/logout').then(() => window.location.href = 'index.html');
+      document
+        .getElementById("logout-btn")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          fetch("api/logout").then(() => (window.location.href = "index.html"));
         });
     </script>
-</body>
+  </body>
 </html>

@@ -1,78 +1,117 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reports - Inventory Management System</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+  <body>
     <header>
-        <nav>
-            <div class="container">
-                <a href="dashboard.html" style="color:white; text-decoration:none; font-size:1.5rem; font-weight:bold;">InvSystem</a>
-                <ul>
-                    <li><a href="dashboard.html">Dashboard</a></li>
-                    <li><a href="products.html">Products</a></li>
-                    <li><a href="transactions.html">Transactions</a></li>
-                    <li><a href="reports.html">Reports</a></li>
-                    <li><a href="#" id="logout-btn" style="color:#ff7675;">Logout</a></li>
-                </ul>
-            </div>
-        </nav>
+      <nav>
+        <div class="container">
+          <a
+            href="dashboard.html"
+            style="
+              color: white;
+              text-decoration: none;
+              font-size: 1.8rem;
+              font-weight: bold;
+              letter-spacing: -1px;
+            "
+            >📦 InvSystem</a
+          >
+          <ul>
+            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li><a href="products.html">📦 Products</a></li>
+            <li><a href="transactions.html">💳 Transactions</a></li>
+            <li><a href="reports.html">📈 Reports</a></li>
+            <li><a href="#" id="logout-btn">🚪 Logout</a></li>
+          </ul>
+        </div>
+      </nav>
     </header>
     <main class="container">
-        <h1>Transaction Reports</h1>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date & Time</th>
-                        <th>Product</th>
-                        <th>Type</th>
-                        <th>Quantity</th>
-                        <th>Processed By</th>
-                    </tr>
-                </thead>
-                <tbody id="reports-body">
-                    <!-- Loading... -->
-                </tbody>
-            </table>
-        </div>
+      <div style="margin-bottom: 2rem">
+        <h1>📈 Transaction Reports</h1>
+        <p style="color: var(--text-light); margin-top: 0.5rem">
+          View all stock movements and transactions
+        </p>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>📅 Date & Time</th>
+              <th>📦 Product</th>
+              <th>📊 Type</th>
+              <th>🔢 Quantity</th>
+              <th>👤 Processed By</th>
+            </tr>
+          </thead>
+          <tbody id="reports-body">
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 2rem">
+                Loading...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </main>
+
+    <footer
+      style="
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-light);
+        margin-top: 2rem;
+        border-top: 1px solid var(--border-color);
+      "
+    >
+      <p>&copy; 2026 InvSystem - Modern Inventory Management</p>
+    </footer>
 
     <script src="assets/js/main.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            InvApp.checkSession().then(() => {
-                fetch('api/transactions')
-                .then(res => res.json())
-                .then(data => {
-                    const body = document.getElementById('reports-body');
-                    body.innerHTML = '';
-                    if (!data.data || data.data.length === 0) {
-                        body.innerHTML = '<tr><td colspan="5" style="text-align:center;">No transactions found.</td></tr>';
-                    } else {
-                        data.data.forEach(r => {
-                            const tr = document.createElement('tr');
-                            tr.innerHTML = `
+      document.addEventListener("DOMContentLoaded", function () {
+        InvApp.checkSession().then(() => {
+          fetch("api/transactions")
+            .then((res) => res.json())
+            .then((data) => {
+              const body = document.getElementById("reports-body");
+              body.innerHTML = "";
+              if (!data.data || data.data.length === 0) {
+                body.innerHTML =
+                  '<tr><td colspan="5" style="text-align:center; padding: 2rem; color: var(--text-light);">No transactions found.</td></tr>';
+              } else {
+                data.data.forEach((r) => {
+                  const tr = document.createElement("tr");
+                  const icon = r.transaction_type === "in" ? "📥" : "📤";
+                  const badge =
+                    r.transaction_type === "in"
+                      ? "badge-success"
+                      : "badge-danger";
+                  tr.innerHTML = `
                                 <td>${new Date(r.transaction_date).toLocaleString()}</td>
-                                <td>${r.product_name}</td>
-                                <td style="font-weight:bold; color: ${r.transaction_type === 'in' ? 'green' : 'red'}">${r.transaction_type.toUpperCase()}</td>
-                                <td>${r.quantity}</td>
+                                <td><strong>${r.product_name}</strong></td>
+                                <td><span class="badge ${badge}">${icon} ${r.transaction_type.toUpperCase()}</span></td>
+                                <td><strong>${r.quantity}</strong></td>
                                 <td>${r.username}</td>
                             `;
-                            body.appendChild(tr);
-                        });
-                    }
+                  body.appendChild(tr);
                 });
+              }
             });
         });
+      });
 
-        document.getElementById('logout-btn').addEventListener('click', function(e) {
-            e.preventDefault();
-            fetch('api/logout').then(() => window.location.href = 'index.html');
+      document
+        .getElementById("logout-btn")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          fetch("api/logout").then(() => (window.location.href = "index.html"));
         });
     </script>
-</body>
+  </body>
 </html>

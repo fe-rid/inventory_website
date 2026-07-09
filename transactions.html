@@ -1,101 +1,159 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Transactions - Inventory Management System</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+  <body>
     <header>
-        <nav>
-            <div class="container">
-                <a href="dashboard.html" style="color:white; text-decoration:none; font-size:1.5rem; font-weight:bold;">InvSystem</a>
-                <ul>
-                    <li><a href="dashboard.html">Dashboard</a></li>
-                    <li><a href="products.html">Products</a></li>
-                    <li><a href="transactions.html">Transactions</a></li>
-                    <li><a href="reports.html">Reports</a></li>
-                    <li><a href="#" id="logout-btn" style="color:#ff7675;">Logout</a></li>
-                </ul>
-            </div>
-        </nav>
+      <nav>
+        <div class="container">
+          <a
+            href="dashboard.html"
+            style="
+              color: white;
+              text-decoration: none;
+              font-size: 1.8rem;
+              font-weight: bold;
+              letter-spacing: -1px;
+            "
+            >📦 InvSystem</a
+          >
+          <ul>
+            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li><a href="products.html">📦 Products</a></li>
+            <li><a href="transactions.html">💳 Transactions</a></li>
+            <li><a href="reports.html">📈 Reports</a></li>
+            <li><a href="#" id="logout-btn">🚪 Logout</a></li>
+          </ul>
+        </div>
+      </nav>
     </header>
     <main class="container">
-        <h1>Stock IN / OUT</h1>
-        <div id="msg" class="alert" style="display:none;"></div>
-
-        <div style="max-width: 600px; background: white; padding: 2rem; border-radius: 8px;">
-            <form id="trans-form">
-                <div class="form-group">
-                    <label>Select Product</label>
-                    <select name="product_id" id="prod-select" required>
-                        <option value="">-- Loading products... --</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Transaction Type</label>
-                    <select name="transaction_type" required>
-                        <option value="in">Stock IN (+)</option>
-                        <option value="out">Stock OUT (-)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Quantity</label>
-                    <input type="number" name="quantity" min="1" required>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width:auto;">Process Transaction</button>
-            </form>
+      <div style="max-width: 800px; margin: 0 auto">
+        <div style="margin-bottom: 2rem">
+          <h1>💳 Process Stock Transaction</h1>
+          <p style="color: var(--text-light); margin-top: 0.5rem">
+            Add or remove inventory from your stock
+          </p>
         </div>
+        <div id="msg" class="alert" style="display: none"></div>
+
+        <div
+          style="
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+          "
+        >
+          <form id="trans-form">
+            <div class="form-group">
+              <label>📦 Select Product</label>
+              <select name="product_id" id="prod-select" required>
+                <option value="">-- Loading products... --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>📊 Transaction Type</label>
+              <select name="transaction_type" required>
+                <option value="in">📥 Stock IN (Add to inventory)</option>
+                <option value="out">
+                  📤 Stock OUT (Remove from inventory)
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>🔢 Quantity</label>
+              <input
+                type="number"
+                name="quantity"
+                min="1"
+                placeholder="Enter quantity"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-success">
+              ✓ Process Transaction
+            </button>
+          </form>
+        </div>
+      </div>
     </main>
+
+    <footer
+      style="
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-light);
+        margin-top: 2rem;
+        border-top: 1px solid var(--border-color);
+      "
+    >
+      <p>&copy; 2026 InvSystem - Modern Inventory Management</p>
+    </footer>
 
     <script src="assets/js/main.js"></script>
     <script>
-        function loadProductsForSelect() {
-            fetch('api/products')
-            .then(res => res.json())
-            .then(data => {
-                const select = document.getElementById('prod-select');
-                select.innerHTML = '<option value="">-- Choose Product --</option>';
-                data.data.forEach(p => {
-                    const opt = document.createElement('option');
-                    opt.value = p.product_id;
-                    opt.textContent = `${p.product_name} (Current: ${p.quantity})`;
-                    select.appendChild(opt);
-                });
+      function loadProductsForSelect() {
+        fetch("api/products")
+          .then((res) => res.json())
+          .then((data) => {
+            const select = document.getElementById("prod-select");
+            select.innerHTML = '<option value="">-- Choose Product --</option>';
+            data.data.forEach((p) => {
+              const opt = document.createElement("option");
+              opt.value = p.product_id;
+              opt.textContent = `${p.product_name} (Current: ${p.quantity})`;
+              select.appendChild(opt);
             });
-        }
+          });
+      }
 
-        document.addEventListener('DOMContentLoaded', loadProductsForSelect);
+      document.addEventListener("DOMContentLoaded", function () {
+        InvApp.checkSession().then(loadProductsForSelect);
+      });
 
-        document.getElementById('trans-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const payload = {
-                product_id:       document.getElementById('prod-select').value,
-                transaction_type: this.querySelector('[name="transaction_type"]').value,
-                quantity:         this.querySelector('[name="quantity"]').value,
-            };
-            fetch('api/transactions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.json())
-            .then(data => {
-                const msg = document.getElementById('msg');
-                msg.textContent = data.success ? 'Transaction successful!' : 'Error: ' + data.message;
-                msg.className = data.success ? 'alert alert-success' : 'alert alert-danger';
-                msg.style.display = 'block';
-                if (data.success) {
-                    this.reset();
-                    loadProductsForSelect();
-                }
+      document
+        .getElementById("trans-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const payload = {
+            product_id: document.getElementById("prod-select").value,
+            transaction_type: this.querySelector('[name="transaction_type"]')
+              .value,
+            quantity: this.querySelector('[name="quantity"]').value,
+          };
+          fetch("api/transactions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              const msg = document.getElementById("msg");
+              msg.textContent = data.success
+                ? "✓ Transaction successful!"
+                : "✗ Error: " + data.message;
+              msg.className = data.success
+                ? "alert alert-success"
+                : "alert alert-danger";
+              msg.style.display = "block";
+              if (data.success) {
+                this.reset();
+                loadProductsForSelect();
+              }
             });
         });
+
+      document
+        .getElementById("logout-btn")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          fetch("api/logout").then(() => (window.location.href = "index.html"));
+        });
     </script>
-    <style>
-        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    </style>
-</body>
+  </body>
 </html>
